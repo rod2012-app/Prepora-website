@@ -96,12 +96,12 @@ export default function IngredientsScreen() {
 
   const deleteIngredient = async (ingredientId: string) => {
     Alert.alert(
-      'Delete Ingredient',
-      'Are you sure you want to remove this ingredient?',
+      'Remove Ingredient',
+      'Remove this from your pantry?',
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Delete',
+          text: 'Remove',
           style: 'destructive',
           onPress: async () => {
             try {
@@ -109,7 +109,7 @@ export default function IngredientsScreen() {
               fetchIngredients();
             } catch (error) {
               console.error('Error deleting ingredient:', error);
-              Alert.alert('Error', 'Failed to delete ingredient');
+              Alert.alert('Error', 'Failed to remove ingredient');
             }
           },
         },
@@ -132,14 +132,14 @@ export default function IngredientsScreen() {
   const renderIngredient = ({ item }: { item: UserIngredient }) => (
     <View style={styles.ingredientItem}>
       <View style={styles.ingredientIcon}>
-        <MaterialCommunityIcons name="food-variant" size={24} color="#4CAF50" />
+        <MaterialCommunityIcons name="food-variant" size={20} color="#FF9B85" />
       </View>
       <Text style={styles.ingredientName}>{item.ingredient_name}</Text>
       <TouchableOpacity
         onPress={() => deleteIngredient(item.id)}
         style={styles.deleteButton}
       >
-        <MaterialCommunityIcons name="close" size={20} color="#ff5252" />
+        <MaterialCommunityIcons name="close-circle" size={20} color="#FFB5A0" />
       </TouchableOpacity>
     </View>
   );
@@ -150,14 +150,14 @@ export default function IngredientsScreen() {
       onPress={() => addIngredient(item)}
     >
       <Text style={styles.commonIngredientText}>{item}</Text>
-      <MaterialCommunityIcons name="plus" size={18} color="#4CAF50" />
+      <MaterialCommunityIcons name="plus" size={16} color="#FF9B85" />
     </TouchableOpacity>
   );
 
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#4CAF50" />
+        <ActivityIndicator size="large" color="#FF9B85" />
       </View>
     );
   }
@@ -165,7 +165,12 @@ export default function IngredientsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>My Pantry</Text>
+        <View>
+          <Text style={styles.title}>My Pantry</Text>
+          <Text style={styles.subtitle}>
+            {ingredients.length} {ingredients.length === 1 ? 'ingredient' : 'ingredients'}
+          </Text>
+        </View>
         <TouchableOpacity
           style={styles.addButton}
           onPress={() => setShowAddModal(true)}
@@ -176,9 +181,17 @@ export default function IngredientsScreen() {
 
       {ingredients.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <MaterialCommunityIcons name="food-off" size={64} color="#555" />
-          <Text style={styles.emptyText}>No ingredients yet</Text>
-          <Text style={styles.emptySubtext}>Add ingredients to get started</Text>
+          <View style={styles.emptyIcon}>
+            <MaterialCommunityIcons name="basket-outline" size={64} color="#DDD" />
+          </View>
+          <Text style={styles.emptyText}>Your pantry is empty</Text>
+          <Text style={styles.emptySubtext}>Add ingredients to get personalized meal plans</Text>
+          <TouchableOpacity
+            style={styles.emptyButton}
+            onPress={() => setShowAddModal(true)}
+          >
+            <Text style={styles.emptyButtonText}>Add Your First Ingredient</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <FlatList
@@ -201,14 +214,14 @@ export default function IngredientsScreen() {
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Add Ingredient</Text>
               <TouchableOpacity onPress={() => setShowAddModal(false)}>
-                <MaterialCommunityIcons name="close" size={24} color="#fff" />
+                <MaterialCommunityIcons name="close" size={24} color="#666" />
               </TouchableOpacity>
             </View>
 
             <TextInput
               style={styles.input}
               placeholder="Search or type ingredient name"
-              placeholderTextColor="#666"
+              placeholderTextColor="#BBB"
               value={newIngredient}
               onChangeText={filterIngredients}
               autoFocus
@@ -219,12 +232,12 @@ export default function IngredientsScreen() {
                 style={styles.customAddButton}
                 onPress={() => addIngredient(newIngredient)}
               >
-                <MaterialCommunityIcons name="plus-circle" size={20} color="#4CAF50" />
+                <MaterialCommunityIcons name="plus-circle" size={20} color="#FF9B85" />
                 <Text style={styles.customAddText}>Add "{newIngredient}"</Text>
               </TouchableOpacity>
             )}
 
-            <Text style={styles.commonTitle}>Common Ingredients</Text>
+            <Text style={styles.commonTitle}>Suggestions</Text>
             <FlatList
               data={filteredIngredients}
               renderItem={renderCommonIngredient}
@@ -242,13 +255,13 @@ export default function IngredientsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0c0c0c',
+    backgroundColor: '#FEFEFE',
   },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#0c0c0c',
+    backgroundColor: '#FEFEFE',
   },
   header: {
     flexDirection: 'row',
@@ -258,17 +271,27 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#3D3D3D',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#999',
+    marginTop: 4,
   },
   addButton: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#FF9B85',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#FF9B85',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
   listContent: {
     padding: 20,
@@ -278,15 +301,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
     marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   ingredientIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#0c0c0c',
+    backgroundColor: '#FFF5F3',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -294,8 +322,9 @@ const styles = StyleSheet.create({
   ingredientName: {
     flex: 1,
     fontSize: 16,
-    color: '#fff',
+    color: '#3D3D3D',
     textTransform: 'capitalize',
+    fontWeight: '500',
   },
   deleteButton: {
     padding: 8,
@@ -306,24 +335,39 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 40,
   },
+  emptyIcon: {
+    marginBottom: 16,
+  },
   emptyText: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '600',
-    color: '#fff',
-    marginTop: 16,
+    color: '#3D3D3D',
+    marginBottom: 8,
   },
   emptySubtext: {
-    fontSize: 14,
-    color: '#888',
-    marginTop: 8,
+    fontSize: 15,
+    color: '#999',
+    textAlign: 'center',
+    marginBottom: 32,
+  },
+  emptyButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    backgroundColor: '#FF9B85',
+    borderRadius: 16,
+  },
+  emptyButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#FFF',
   },
   modalContainer: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
   modalContent: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#FEFEFE',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 20,
@@ -337,38 +381,40 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: '700',
+    color: '#3D3D3D',
   },
   input: {
-    backgroundColor: '#0c0c0c',
-    borderRadius: 12,
+    backgroundColor: '#F8F8F8',
+    borderRadius: 16,
     padding: 16,
     fontSize: 16,
-    color: '#fff',
+    color: '#3D3D3D',
     marginBottom: 16,
   },
   customAddButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    padding: 12,
-    backgroundColor: '#0c0c0c',
-    borderRadius: 12,
+    padding: 14,
+    backgroundColor: '#FFF5F3',
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#4CAF50',
+    borderColor: '#FFE5E0',
     marginBottom: 20,
   },
   customAddText: {
     fontSize: 16,
-    color: '#4CAF50',
+    color: '#FF9B85',
     fontWeight: '600',
   },
   commonTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
-    color: '#888',
+    color: '#999',
     marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   commonGrid: {
     paddingBottom: 20,
@@ -380,13 +426,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 12,
     margin: 4,
-    backgroundColor: '#0c0c0c',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#333',
+    backgroundColor: '#F8F8F8',
+    borderRadius: 12,
   },
   commonIngredientText: {
     fontSize: 14,
-    color: '#fff',
+    color: '#3D3D3D',
+    fontWeight: '500',
   },
 });

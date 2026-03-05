@@ -65,8 +65,8 @@ export default function FavoritesScreen() {
 
   const deleteFavorite = async (favoriteId: string) => {
     Alert.alert(
-      'Remove from Favorites',
-      'Are you sure you want to remove this recipe?',
+      'Remove Favorite',
+      'Remove this recipe from favorites?',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -102,35 +102,33 @@ export default function FavoritesScreen() {
       style={styles.favoriteCard}
       onPress={() => viewRecipe(item.recipe)}
     >
-      <View style={styles.cardContent}>
-        <View style={styles.iconContainer}>
-          <MaterialCommunityIcons name="silverware-fork-knife" size={32} color="#4CAF50" />
-        </View>
-        <View style={styles.textContent}>
-          <Text style={styles.recipeName}>{item.recipe.name}</Text>
-          <View style={styles.infoRow}>
-            <View style={styles.infoItem}>
-              <MaterialCommunityIcons name="clock-outline" size={14} color="#888" />
-              <Text style={styles.infoText}>{item.recipe.prep_time}</Text>
-            </View>
-            <View style={styles.infoItem}>
-              <MaterialCommunityIcons name="fire" size={14} color="#888" />
-              <Text style={styles.infoText}>{item.recipe.cook_time}</Text>
-            </View>
+      <View style={styles.iconContainer}>
+        <MaterialCommunityIcons name="silverware-fork-knife" size={28} color="#FF9B85" />
+      </View>
+      <View style={styles.textContent}>
+        <Text style={styles.recipeName}>{item.recipe.name}</Text>
+        <View style={styles.infoRow}>
+          <View style={styles.infoItem}>
+            <MaterialCommunityIcons name="clock-outline" size={13} color="#BBB" />
+            <Text style={styles.infoText}>{item.recipe.prep_time}</Text>
           </View>
-          <Text style={styles.savedDate}>
-            Saved {format(new Date(item.added_at), 'MMM dd, yyyy')}
-          </Text>
+          <View style={styles.infoItem}>
+            <MaterialCommunityIcons name="fire" size={13} color="#BBB" />
+            <Text style={styles.infoText}>{item.recipe.cook_time}</Text>
+          </View>
         </View>
+        <Text style={styles.savedDate}>
+          Saved {format(new Date(item.added_at), 'MMM dd')}
+        </Text>
       </View>
       <TouchableOpacity
         onPress={(e) => {
           e.stopPropagation();
           deleteFavorite(item.id);
         }}
-        style={styles.deleteButton}
+        style={styles.heartButton}
       >
-        <MaterialCommunityIcons name="heart" size={24} color="#ff5252" />
+        <MaterialCommunityIcons name="heart" size={24} color="#FFB5A0" />
       </TouchableOpacity>
     </TouchableOpacity>
   );
@@ -138,7 +136,7 @@ export default function FavoritesScreen() {
   if (loading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#4CAF50" />
+        <ActivityIndicator size="large" color="#FF9B85" />
       </View>
     );
   }
@@ -146,15 +144,22 @@ export default function FavoritesScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>My Favorites</Text>
+        <View>
+          <Text style={styles.title}>My Favorites</Text>
+          <Text style={styles.subtitle}>
+            {favorites.length} {favorites.length === 1 ? 'recipe' : 'recipes'}
+          </Text>
+        </View>
       </View>
 
       {favorites.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <MaterialCommunityIcons name="heart-outline" size={64} color="#555" />
+          <View style={styles.emptyIcon}>
+            <MaterialCommunityIcons name="heart-outline" size={64} color="#DDD" />
+          </View>
           <Text style={styles.emptyText}>No favorites yet</Text>
           <Text style={styles.emptySubtext}>
-            Save your favorite recipes here
+            Save your favorite recipes to find them quickly
           </Text>
         </View>
       ) : (
@@ -172,22 +177,27 @@ export default function FavoritesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0c0c0c',
+    backgroundColor: '#FEFEFE',
   },
   centerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#0c0c0c',
+    backgroundColor: '#FEFEFE',
   },
   header: {
     padding: 20,
     paddingTop: 16,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#3D3D3D',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#999',
+    marginTop: 4,
   },
   listContent: {
     padding: 20,
@@ -196,22 +206,21 @@ const styles = StyleSheet.create({
   favoriteCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#1a1a1a',
-    borderRadius: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
     padding: 16,
     marginBottom: 12,
-  },
-  cardContent: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   iconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#0c0c0c',
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#FFF5F3',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
@@ -222,13 +231,13 @@ const styles = StyleSheet.create({
   recipeName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#fff',
-    marginBottom: 6,
+    color: '#3D3D3D',
+    marginBottom: 8,
   },
   infoRow: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   infoItem: {
     flexDirection: 'row',
@@ -237,13 +246,13 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 12,
-    color: '#888',
+    color: '#BBB',
   },
   savedDate: {
     fontSize: 11,
-    color: '#666',
+    color: '#CCC',
   },
-  deleteButton: {
+  heartButton: {
     padding: 8,
   },
   emptyContainer: {
@@ -252,15 +261,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 40,
   },
+  emptyIcon: {
+    marginBottom: 16,
+  },
   emptyText: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '600',
-    color: '#fff',
-    marginTop: 16,
+    color: '#3D3D3D',
+    marginBottom: 8,
   },
   emptySubtext: {
-    fontSize: 14,
-    color: '#888',
-    marginTop: 8,
+    fontSize: 15,
+    color: '#999',
+    textAlign: 'center',
   },
 });

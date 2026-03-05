@@ -48,7 +48,6 @@ export default function HomeScreen() {
 
     setLoading(true);
     try {
-      // Get user's available ingredients
       const ingredientsResponse = await axios.get(
         `${BACKEND_URL}/api/ingredients/${userId}`
       );
@@ -56,7 +55,6 @@ export default function HomeScreen() {
         (ing: any) => ing.ingredient_name
       );
 
-      // Generate meal plan
       const response = await axios.post(`${BACKEND_URL}/api/meal-plan/generate`, {
         user_id: userId,
         plan_type: planType,
@@ -66,7 +64,7 @@ export default function HomeScreen() {
 
       Alert.alert(
         'Success!',
-        `Your ${planType} ${cuisineType} meal plan has been created!`,
+        `Your ${planType} ${cuisineType} meal plan is ready!`,
         [
           {
             text: 'View Plans',
@@ -88,26 +86,29 @@ export default function HomeScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <View style={styles.header}>
-          <MaterialCommunityIcons name="chef-hat" size={48} color="#4CAF50" />
-          <Text style={styles.title}>Meal Planner</Text>
-          <Text style={styles.subtitle}>Your personal cooking assistant</Text>
+          <View style={styles.iconContainer}>
+            <MaterialCommunityIcons name="food" size={32} color="#FF9B85" />
+          </View>
+          <Text style={styles.greeting}>Good day!</Text>
+          <Text style={styles.title}>Let's plan your meals</Text>
+          <Text style={styles.subtitle}>Create personalized meal plans in seconds</Text>
         </View>
 
-        {/* Plan Type Selection */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Plan Duration</Text>
+        {/* Plan Type Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>How long should we plan for?</Text>
           <View style={styles.buttonGroup}>
             <TouchableOpacity
               style={[
                 styles.optionButton,
-                planType === 'daily' && styles.optionButtonActive,
+                planType === 'daily' && styles.optionButtonActivePrimary,
               ]}
               onPress={() => setPlanType('daily')}
             >
               <MaterialCommunityIcons
                 name="calendar-today"
-                size={24}
-                color={planType === 'daily' ? '#fff' : '#4CAF50'}
+                size={20}
+                color={planType === 'daily' ? '#FFF' : '#FF9B85'}
               />
               <Text
                 style={[
@@ -115,21 +116,21 @@ export default function HomeScreen() {
                   planType === 'daily' && styles.optionTextActive,
                 ]}
               >
-                Daily
+                One Day
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[
                 styles.optionButton,
-                planType === 'weekly' && styles.optionButtonActive,
+                planType === 'weekly' && styles.optionButtonActivePrimary,
               ]}
               onPress={() => setPlanType('weekly')}
             >
               <MaterialCommunityIcons
                 name="calendar-week"
-                size={24}
-                color={planType === 'weekly' ? '#fff' : '#4CAF50'}
+                size={20}
+                color={planType === 'weekly' ? '#FFF' : '#FF9B85'}
               />
               <Text
                 style={[
@@ -137,57 +138,57 @@ export default function HomeScreen() {
                   planType === 'weekly' && styles.optionTextActive,
                 ]}
               >
-                Weekly
+                Full Week
               </Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Cuisine Type Selection */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Meal Style</Text>
+        {/* Cuisine Type Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>What's your mood today?</Text>
           <View style={styles.buttonGroup}>
             <TouchableOpacity
               style={[
                 styles.optionButton,
-                cuisineType === 'healthy' && styles.optionButtonActive,
+                cuisineType === 'healthy' && styles.optionButtonActiveSecondary,
               ]}
               onPress={() => setCuisineType('healthy')}
             >
               <MaterialCommunityIcons
-                name="food-apple"
-                size={24}
-                color={cuisineType === 'healthy' ? '#fff' : '#4CAF50'}
+                name="leaf"
+                size={20}
+                color={cuisineType === 'healthy' ? '#FFF' : '#A8C5A8'}
               />
               <Text
                 style={[
-                  styles.optionText,
+                  styles.optionTextSecondary,
                   cuisineType === 'healthy' && styles.optionTextActive,
                 ]}
               >
-                Healthy
+                Fresh & Healthy
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[
                 styles.optionButton,
-                cuisineType === 'comfort' && styles.optionButtonActive,
+                cuisineType === 'comfort' && styles.optionButtonActiveSecondary,
               ]}
               onPress={() => setCuisineType('comfort')}
             >
               <MaterialCommunityIcons
-                name="food"
-                size={24}
-                color={cuisineType === 'comfort' ? '#fff' : '#4CAF50'}
+                name="heart"
+                size={20}
+                color={cuisineType === 'comfort' ? '#FFF' : '#A8C5A8'}
               />
               <Text
                 style={[
-                  styles.optionText,
+                  styles.optionTextSecondary,
                   cuisineType === 'comfort' && styles.optionTextActive,
                 ]}
               >
-                Comfort
+                Comfort Food
               </Text>
             </TouchableOpacity>
           </View>
@@ -195,9 +196,9 @@ export default function HomeScreen() {
 
         {/* Info Card */}
         <View style={styles.infoCard}>
-          <MaterialCommunityIcons name="information" size={20} color="#4CAF50" />
+          <MaterialCommunityIcons name="lightbulb-on-outline" size={20} color="#B8A8D8" />
           <Text style={styles.infoText}>
-            Add ingredients to your pantry for personalized meal suggestions!
+            Add ingredients to your pantry for personalized suggestions!
           </Text>
         </View>
 
@@ -208,10 +209,13 @@ export default function HomeScreen() {
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator color="#fff" />
+            <>
+              <ActivityIndicator color="#fff" />
+              <Text style={styles.generateButtonText}>Creating your plan...</Text>
+            </>
           ) : (
             <>
-              <MaterialCommunityIcons name="magic-staff" size={24} color="#fff" />
+              <MaterialCommunityIcons name="auto-fix" size={24} color="#fff" />
               <Text style={styles.generateButtonText}>Generate Meal Plan</Text>
             </>
           )}
@@ -220,19 +224,25 @@ export default function HomeScreen() {
         {/* Quick Actions */}
         <View style={styles.quickActions}>
           <TouchableOpacity
-            style={styles.quickActionButton}
+            style={styles.quickActionCard}
             onPress={() => router.push('/ingredients')}
           >
-            <MaterialCommunityIcons name="plus-circle" size={32} color="#4CAF50" />
-            <Text style={styles.quickActionText}>Add Ingredients</Text>
+            <View style={styles.quickActionIcon}>
+              <MaterialCommunityIcons name="basket" size={28} color="#FF9B85" />
+            </View>
+            <Text style={styles.quickActionTitle}>My Pantry</Text>
+            <Text style={styles.quickActionSubtitle}>Manage ingredients</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.quickActionButton}
+            style={styles.quickActionCard}
             onPress={() => router.push('/meal-plans')}
           >
-            <MaterialCommunityIcons name="book-open-variant" size={32} color="#4CAF50" />
-            <Text style={styles.quickActionText}>View Plans</Text>
+            <View style={styles.quickActionIcon}>
+              <MaterialCommunityIcons name="book-open-variant" size={28} color="#A8C5A8" />
+            </View>
+            <Text style={styles.quickActionTitle}>My Plans</Text>
+            <Text style={styles.quickActionSubtitle}>View all plans</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -243,35 +253,58 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0c0c0c',
+    backgroundColor: '#FEFEFE',
   },
   scrollContent: {
     padding: 20,
+    paddingBottom: 40,
   },
   header: {
     alignItems: 'center',
     marginBottom: 32,
-    marginTop: 16,
+    marginTop: 8,
+  },
+  iconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#FFF5F3',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  greeting: {
+    fontSize: 16,
+    color: '#999',
+    marginBottom: 4,
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginTop: 16,
+    fontWeight: '700',
+    color: '#3D3D3D',
+    marginBottom: 8,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#888',
-    marginTop: 8,
+    textAlign: 'center',
   },
-  section: {
-    marginBottom: 24,
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  sectionTitle: {
-    fontSize: 18,
+  cardTitle: {
+    fontSize: 17,
     fontWeight: '600',
-    color: '#fff',
-    marginBottom: 12,
+    color: '#3D3D3D',
+    marginBottom: 16,
   },
   buttonGroup: {
     flexDirection: 'row',
@@ -284,73 +317,103 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     padding: 16,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
+    backgroundColor: '#F8F8F8',
+    borderRadius: 16,
     borderWidth: 2,
-    borderColor: '#4CAF50',
+    borderColor: 'transparent',
   },
-  optionButtonActive: {
-    backgroundColor: '#4CAF50',
+  optionButtonActivePrimary: {
+    backgroundColor: '#FF9B85',
+    borderColor: '#FF9B85',
+  },
+  optionButtonActiveSecondary: {
+    backgroundColor: '#A8C5A8',
+    borderColor: '#A8C5A8',
   },
   optionText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
-    color: '#4CAF50',
+    color: '#FF9B85',
+  },
+  optionTextSecondary: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#A8C5A8',
   },
   optionTextActive: {
-    color: '#fff',
+    color: '#FFF',
   },
   infoCard: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
     padding: 16,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#4CAF50',
+    backgroundColor: '#F8F5FF',
+    borderRadius: 16,
     marginBottom: 24,
   },
   infoText: {
     flex: 1,
     fontSize: 14,
-    color: '#ccc',
+    color: '#666',
+    lineHeight: 20,
   },
   generateButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 12,
-    padding: 18,
-    backgroundColor: '#4CAF50',
-    borderRadius: 12,
-    marginBottom: 32,
+    padding: 20,
+    backgroundColor: '#FF9B85',
+    borderRadius: 20,
+    marginBottom: 24,
+    shadowColor: '#FF9B85',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   generateButtonDisabled: {
     opacity: 0.6,
   },
   generateButtonText: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: '#fff',
   },
   quickActions: {
     flexDirection: 'row',
     gap: 12,
   },
-  quickActionButton: {
+  quickActionCard: {
     flex: 1,
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#333',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  quickActionText: {
-    fontSize: 14,
-    color: '#fff',
-    marginTop: 8,
-    textAlign: 'center',
+  quickActionIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#F8F8F8',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  quickActionTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#3D3D3D',
+    marginBottom: 4,
+  },
+  quickActionSubtitle: {
+    fontSize: 12,
+    color: '#999',
   },
 });

@@ -76,43 +76,57 @@ export default function RecipeDetailScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <MaterialCommunityIcons name="arrow-left" size={24} color="#fff" />
+            <MaterialCommunityIcons name="arrow-left" size={24} color="#3D3D3D" />
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.favoriteButton}
+            style={[styles.favoriteButton, isFavorited && styles.favoriteButtonActive]}
             onPress={addToFavorites}
             disabled={isFavorited}
           >
             <MaterialCommunityIcons
               name={isFavorited ? 'heart' : 'heart-outline'}
               size={24}
-              color={isFavorited ? '#ff5252' : '#fff'}
+              color={isFavorited ? '#FFF' : '#FF9B85'}
             />
           </TouchableOpacity>
         </View>
 
         {/* Recipe Title */}
         <View style={styles.titleSection}>
-          <Text style={styles.mealTypeBadge}>{mealType}</Text>
-          {day && <Text style={styles.dayBadge}>{day}</Text>}
+          <View style={styles.badgeContainer}>
+            <View style={styles.mealTypeBadge}>
+              <Text style={styles.mealTypeBadgeText}>{mealType}</Text>
+            </View>
+            {day && (
+              <View style={styles.dayBadge}>
+                <Text style={styles.dayBadgeText}>{day}</Text>
+              </View>
+            )}
+          </View>
           <Text style={styles.recipeTitle}>{recipe.name}</Text>
         </View>
 
         {/* Recipe Info */}
         <View style={styles.infoSection}>
           <View style={styles.infoCard}>
-            <MaterialCommunityIcons name="clock-outline" size={24} color="#4CAF50" />
-            <Text style={styles.infoLabel}>Prep Time</Text>
+            <View style={styles.infoIcon}>
+              <MaterialCommunityIcons name="clock-outline" size={24} color="#FF9B85" />
+            </View>
+            <Text style={styles.infoLabel}>Prep</Text>
             <Text style={styles.infoValue}>{recipe.prep_time}</Text>
           </View>
           <View style={styles.infoCard}>
-            <MaterialCommunityIcons name="fire" size={24} color="#4CAF50" />
-            <Text style={styles.infoLabel}>Cook Time</Text>
+            <View style={styles.infoIcon}>
+              <MaterialCommunityIcons name="fire" size={24} color="#FFB5A0" />
+            </View>
+            <Text style={styles.infoLabel}>Cook</Text>
             <Text style={styles.infoValue}>{recipe.cook_time}</Text>
           </View>
           <View style={styles.infoCard}>
-            <MaterialCommunityIcons name="account-group" size={24} color="#4CAF50" />
-            <Text style={styles.infoLabel}>Servings</Text>
+            <View style={styles.infoIcon}>
+              <MaterialCommunityIcons name="account-group" size={24} color="#A8C5A8" />
+            </View>
+            <Text style={styles.infoLabel}>Serves</Text>
             <Text style={styles.infoValue}>{recipe.servings}</Text>
           </View>
         </View>
@@ -120,21 +134,27 @@ export default function RecipeDetailScreen() {
         {/* Ingredients */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <MaterialCommunityIcons name="food-variant" size={24} color="#4CAF50" />
+            <View style={styles.sectionIconContainer}>
+              <MaterialCommunityIcons name="food-variant" size={20} color="#FF9B85" />
+            </View>
             <Text style={styles.sectionTitle}>Ingredients</Text>
           </View>
-          {recipe.ingredients.map((ingredient: string, index: number) => (
-            <View key={index} style={styles.ingredientItem}>
-              <View style={styles.bulletPoint} />
-              <Text style={styles.ingredientText}>{ingredient}</Text>
-            </View>
-          ))}
+          <View style={styles.ingredientsList}>
+            {recipe.ingredients.map((ingredient: string, index: number) => (
+              <View key={index} style={styles.ingredientItem}>
+                <View style={styles.bulletPoint} />
+                <Text style={styles.ingredientText}>{ingredient}</Text>
+              </View>
+            ))}
+          </View>
         </View>
 
         {/* Instructions */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <MaterialCommunityIcons name="chef-hat" size={24} color="#4CAF50" />
+            <View style={styles.sectionIconContainer}>
+              <MaterialCommunityIcons name="chef-hat" size={20} color="#A8C5A8" />
+            </View>
             <Text style={styles.sectionTitle}>Instructions</Text>
           </View>
           {recipe.instructions.map((instruction: string, index: number) => (
@@ -154,7 +174,7 @@ export default function RecipeDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0c0c0c',
+    backgroundColor: '#FEFEFE',
   },
   scrollContent: {
     padding: 20,
@@ -166,51 +186,59 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#1a1a1a',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#F8F8F8',
     justifyContent: 'center',
     alignItems: 'center',
   },
   favoriteButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#1a1a1a',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#FFF5F3',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  favoriteButtonActive: {
+    backgroundColor: '#FF9B85',
   },
   titleSection: {
     marginBottom: 24,
   },
+  badgeContainer: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 12,
+  },
   mealTypeBadge: {
-    alignSelf: 'flex-start',
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#4CAF50',
-    backgroundColor: 'rgba(76, 175, 80, 0.2)',
     paddingHorizontal: 12,
     paddingVertical: 6,
+    backgroundColor: '#FFF5F3',
     borderRadius: 12,
-    marginBottom: 8,
-    textTransform: 'uppercase',
+  },
+  mealTypeBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#FF9B85',
+    textTransform: 'capitalize',
   },
   dayBadge: {
-    alignSelf: 'flex-start',
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#888',
-    backgroundColor: '#1a1a1a',
     paddingHorizontal: 12,
     paddingVertical: 6,
+    backgroundColor: '#F0F5F0',
     borderRadius: 12,
-    marginBottom: 8,
+  },
+  dayBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#A8C5A8',
   },
   recipeTitle: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: '700',
+    color: '#3D3D3D',
     lineHeight: 36,
   },
   infoSection: {
@@ -222,19 +250,26 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  infoIcon: {
+    marginBottom: 8,
   },
   infoLabel: {
     fontSize: 12,
-    color: '#888',
-    marginTop: 8,
+    color: '#BBB',
+    marginBottom: 4,
   },
   infoValue: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
-    color: '#fff',
-    marginTop: 4,
+    color: '#3D3D3D',
   },
   section: {
     marginBottom: 32,
@@ -242,13 +277,31 @@ const styles = StyleSheet.create({
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
     marginBottom: 16,
+  },
+  sectionIconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F8F8F8',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: '700',
+    color: '#3D3D3D',
+  },
+  ingredientsList: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   ingredientItem: {
     flexDirection: 'row',
@@ -259,42 +312,50 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#FF9B85',
     marginRight: 12,
   },
   ingredientText: {
     flex: 1,
-    fontSize: 16,
-    color: '#fff',
-    lineHeight: 24,
+    fontSize: 15,
+    color: '#3D3D3D',
+    lineHeight: 22,
   },
   instructionItem: {
     flexDirection: 'row',
     marginBottom: 20,
+    backgroundColor: '#FFFFFF',
+    padding: 16,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   stepNumber: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#A8C5A8',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
   stepNumberText: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: '#fff',
   },
   instructionText: {
     flex: 1,
-    fontSize: 16,
-    color: '#fff',
-    lineHeight: 24,
+    fontSize: 15,
+    color: '#3D3D3D',
+    lineHeight: 22,
   },
   errorText: {
     fontSize: 18,
-    color: '#fff',
+    color: '#3D3D3D',
     textAlign: 'center',
     marginTop: 40,
   },

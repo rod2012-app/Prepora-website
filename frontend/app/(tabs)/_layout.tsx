@@ -5,19 +5,29 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#4CAF50',
-        tabBarInactiveTintColor: '#888',
+        tabBarActiveTintColor: '#FF9B85',
+        tabBarInactiveTintColor: '#BBB',
         tabBarStyle: {
-          backgroundColor: '#1a1a1a',
-          borderTopColor: '#333',
-          height: 60,
-          paddingBottom: 8,
+          backgroundColor: '#FFFFFF',
+          borderTopColor: '#F0F0F0',
+          height: 65,
+          paddingBottom: 10,
+          paddingTop: 8,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.05,
+          shadowRadius: 8,
+          elevation: 8,
         },
         headerStyle: {
-          backgroundColor: '#1a1a1a',
+          backgroundColor: '#FEFEFE',
         },
-        headerTintColor: '#fff',
+        headerTintColor: '#3D3D3D',
         headerShown: false,
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '600',
+        },
       }}
     >
       <Tabs.Screen
@@ -34,7 +44,7 @@ export default function TabLayout() {
         options={{
           title: 'Pantry',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="food-apple" size={size} color={color} />
+            <MaterialCommunityIcons name="basket" size={size} color={color} />
           ),
         }}
       />
