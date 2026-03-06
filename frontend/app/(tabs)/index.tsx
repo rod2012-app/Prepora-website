@@ -89,9 +89,11 @@ export default function HomeScreen() {
           <View style={styles.iconContainer}>
             <MaterialCommunityIcons name="food" size={32} color="#FF9B85" />
           </View>
+          <Text style={styles.appName}>Prepora</Text>
+          <Text style={styles.tagline}>Plan smart. Eat better. Live easier.</Text>
+          <View style={styles.divider} />
           <Text style={styles.greeting}>Good day!</Text>
           <Text style={styles.title}>Let's plan your meals</Text>
-          <Text style={styles.subtitle}>Create personalized meal plans in seconds</Text>
         </View>
 
         {/* Plan Type Card */}
@@ -273,21 +275,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
+  appName: {
+    fontSize: 36,
+    fontWeight: '800',
+    color: '#FF9B85',
+    letterSpacing: -0.5,
+    marginBottom: 8,
+  },
+  tagline: {
+    fontSize: 14,
+    color: '#A8C5A8',
+    fontWeight: '500',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  divider: {
+    width: 40,
+    height: 3,
+    backgroundColor: '#FFE5E0',
+    borderRadius: 2,
+    marginBottom: 16,
+  },
   greeting: {
     fontSize: 16,
     color: '#999',
     marginBottom: 4,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '700',
     color: '#3D3D3D',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 15,
-    color: '#888',
-    textAlign: 'center',
   },
   card: {
     backgroundColor: '#FFFFFF',
