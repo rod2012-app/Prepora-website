@@ -1,0 +1,13 @@
+{
+  "name": "prepora-website",
+  "version": "1.0.0",
+  "description": "Marketing website for Prepora meal planning app",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'Static site - no build needed'"
+  },
+  "keywords": ["meal-planning", "prepora", "static-website"],
+  "author": "Prepora Team",
+  "license": "MIT"
+}
