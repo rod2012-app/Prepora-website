@@ -1,22 +1,44 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "Prepora",
+    "slug": "prepora",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "frontend",
+    "scheme": "prepora",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "description": "AI-powered meal planning app. Plan smart. Eat better. Live easier.",
+    "primaryColor": "#FF9B85",
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FEFEFE"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.prepora.app",
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Take photos of ingredients",
+        "NSPhotoLibraryUsageDescription": "Access photos from your gallery"
+      }
     },
     "android": {
+      "package": "co.median.android.odmaeyb",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#000"
+        "backgroundColor": "#FF9B85"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -31,12 +53,17 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#000"
+          "backgroundColor": "#FEFEFE"
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "prepora-meal-planner"
+      }
     }
   }
 }
