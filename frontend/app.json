@@ -11,7 +11,7 @@
     "description": "AI-powered meal planning app. Plan smart. Eat better. Live easier.",
     "primaryColor": "#FF9B85",
     "splash": {
-      "image": "./assets/images/splash-icon.png",
+      "image": "./assets/images/splash-image.png",
       "resizeMode": "contain",
       "backgroundColor": "#FEFEFE"
     },
@@ -50,7 +50,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/splash-image.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#FEFEFE"
