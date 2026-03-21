@@ -233,6 +233,8 @@ async def delete_meal_plan(plan_id: str):
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Meal plan not found")
         return {"message": "Meal plan deleted successfully"}
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error deleting meal plan: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -281,6 +283,8 @@ async def delete_ingredient(ingredient_id: str):
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Ingredient not found")
         return {"message": "Ingredient deleted successfully"}
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error deleting ingredient: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -335,6 +339,8 @@ async def delete_favorite(favorite_id: str):
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Favorite not found")
         return {"message": "Favorite deleted successfully"}
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error deleting favorite: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
