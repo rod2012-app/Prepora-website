@@ -9,6 +9,7 @@ import {
   Alert,
   ActivityIndicator,
   Modal,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -27,6 +28,7 @@ export default function IngredientsScreen() {
   const [userId, setUserId] = useState('');
   const [ingredients, setIngredients] = useState<UserIngredient[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newIngredient, setNewIngredient] = useState('');
   const [commonIngredients, setCommonIngredients] = useState<string[]>([]);
@@ -64,6 +66,17 @@ export default function IngredientsScreen() {
       console.error('Error fetching ingredients:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await fetchIngredients();
+    } catch (error) {
+      console.error('Error refreshing:', error);
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -200,6 +213,17 @@ export default function IngredientsScreen() {
           </Text>
         </View>
         <View style={styles.headerActions}>
+          <TouchableOpacity
+            style={styles.refreshButton}
+            onPress={onRefresh}
+            disabled={refreshing}
+          >
+            <MaterialCommunityIcons 
+              name={refreshing ? "loading" : "refresh"} 
+              size={20} 
+              color="#A8C5A8" 
+            />
+          </TouchableOpacity>
           {ingredients.length > 0 && (
             <TouchableOpacity
               style={styles.clearAllButton}
@@ -237,6 +261,14 @@ export default function IngredientsScreen() {
           renderItem={renderIngredient}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={['#FF9B85']}
+              tintColor="#FF9B85"
+            />
+          }
         />
       )}
 
@@ -311,6 +343,16 @@ const styles = StyleSheet.create({
   headerActions: {
     flexDirection: 'row',
     gap: 12,
+  },
+  refreshButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#F0F5F0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E0EDE0',
   },
   clearAllButton: {
     width: 48,
