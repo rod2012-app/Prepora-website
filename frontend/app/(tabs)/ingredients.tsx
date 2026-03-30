@@ -94,7 +94,17 @@ export default function IngredientsScreen() {
     }
   };
 
-  const deleteIngredient = async (ingredientId: string) => {
+  const performDelete = async (ingredientId: string) => {
+    try {
+      await axios.delete(`${BACKEND_URL}/api/ingredients/${ingredientId}`);
+      await fetchIngredients();
+    } catch (error) {
+      console.error('Error deleting ingredient:', error);
+      Alert.alert('Error', 'Failed to remove ingredient');
+    }
+  };
+
+  const deleteIngredient = (ingredientId: string) => {
     Alert.alert(
       'Remove Ingredient',
       'Remove this from your pantry?',
@@ -103,21 +113,24 @@ export default function IngredientsScreen() {
         {
           text: 'Remove',
           style: 'destructive',
-          onPress: async () => {
-            try {
-              await axios.delete(`${BACKEND_URL}/api/ingredients/${ingredientId}`);
-              fetchIngredients();
-            } catch (error) {
-              console.error('Error deleting ingredient:', error);
-              Alert.alert('Error', 'Failed to remove ingredient');
-            }
-          },
+          onPress: () => performDelete(ingredientId),
         },
       ]
     );
   };
 
-  const clearAllIngredients = async () => {
+  const performClearAll = async () => {
+    try {
+      await axios.delete(`${BACKEND_URL}/api/ingredients/clear/${userId}`);
+      await fetchIngredients();
+      Alert.alert('Success', 'All ingredients cleared');
+    } catch (error) {
+      console.error('Error clearing ingredients:', error);
+      Alert.alert('Error', 'Failed to clear ingredients');
+    }
+  };
+
+  const clearAllIngredients = () => {
     Alert.alert(
       'Clear All Ingredients',
       `Remove all ${ingredients.length} ingredients from your pantry?`,
@@ -126,16 +139,7 @@ export default function IngredientsScreen() {
         {
           text: 'Clear All',
           style: 'destructive',
-          onPress: async () => {
-            try {
-              await axios.delete(`${BACKEND_URL}/api/ingredients/clear/${userId}`);
-              fetchIngredients();
-              Alert.alert('Success', 'All ingredients cleared');
-            } catch (error) {
-              console.error('Error clearing ingredients:', error);
-              Alert.alert('Error', 'Failed to clear ingredients');
-            }
-          },
+          onPress: () => performClearAll(),
         },
       ]
     );
