@@ -200,6 +200,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ FIXED & TESTED: Fixed exception handling in delete_ingredient endpoint. Now properly returns 404 for non-existent ingredients instead of 500 error. All delete operations working correctly."
+      - working: true
+        agent: "testing"
+        comment: "✅ CRITICAL DELETE FUNCTIONALITY RE-VERIFIED: Comprehensive testing with test_user_delete_verify_20250308 confirms delete functionality working perfectly. Successfully deleted ingredient from 5-ingredient pantry, verified removal (count reduced from 5 to 4), and confirmed proper 404 error handling for non-existent ingredients. All delete operations validated."
 
   - task: "Clear all ingredients for user (NEW ENDPOINT)"
     implemented: true
@@ -215,6 +218,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ COMPREHENSIVE TESTING COMPLETE: New Clear All Ingredients endpoint working perfectly. Successfully clears multiple ingredients (tested with 5 ingredients), returns proper deleted_count in response, handles empty pantry correctly (returns 0), and provides appropriate success messages. All validation scenarios passed."
+      - working: true
+        agent: "testing"
+        comment: "✅ CRITICAL CLEAR FUNCTIONALITY RE-VERIFIED: Comprehensive testing with test_user_delete_verify_20250308 confirms clear functionality working perfectly. Successfully cleared 6 ingredients from pantry, verified complete removal (count reduced to 0), and confirmed proper handling of empty pantry clear (returns deleted_count: 0). All clear operations validated with detailed step-by-step verification."
   
   - task: "Get common ingredients list"
     implemented: true
@@ -377,3 +383,5 @@ agent_communication:
     message: "✅ COMPREHENSIVE TESTING AFTER UI CHANGES COMPLETE: Tested ALL Prepora features including NEW Clear All Ingredients endpoint. SUCCESS RATE: 88% (22/25 tests passed). 🆕 NEW ENDPOINT VALIDATION: DELETE /api/ingredients/clear/{user_id} working perfectly - clears multiple ingredients, returns proper deleted_count, handles empty pantry correctly. ✅ CORE FEATURES RE-TESTED: All ingredient management, meal plan generation (daily healthy/comfort ~10-16s), meal plans retrieval, favorites system working correctly. 🔧 CRITICAL BUG FIXED: Delete ingredient endpoint now properly returns 404 for non-existent ingredients instead of 500 error. ⚡ PERFORMANCE: Excellent for non-AI endpoints (<0.5s), AI generation within expected timeframes. All backend APIs validated and working as expected."
   - agent: "testing"
     message: "✅ COMPREHENSIVE UI CHANGES TESTING COMPLETE: Verified ALL new UI changes and existing functionality. 🆕 HOME SCREEN CHANGES: 'My Pantry - Add Ingredients First' button successfully relocated as PRIMARY action with coral background, positioned prominently after Generate button and before quick action cards. Navigation to pantry working perfectly. 🆕 PANTRY SCREEN CHANGES: Clear All button (delete-sweep icon) correctly implemented in header next to Add button, visible when ingredients present, hidden when pantry empty. Successfully tested ingredient addition and pantry navigation. ✅ RESPONSIVE DESIGN: Verified on iPhone 14 Pro (390x844) and Galaxy S21 (360x800) - all elements properly visible and accessible. ✅ NAVIGATION FLOWS: Home → Pantry primary button, tab navigation, quick action cards all working correctly. ✅ CORE FEATURES: Meal plan generation, ingredient management, all existing functionality preserved. All critical UI changes successfully implemented and tested."
+  - agent: "testing"
+    message: "✅ CRITICAL DELETE/CLEAR FUNCTIONALITY VERIFICATION COMPLETE: Conducted comprehensive testing specifically for user-reported delete/clear issues using test_user_delete_verify_20250308. PERFECT SUCCESS RATE: 7/7 test steps passed. 🔍 DETAILED VERIFICATION: Successfully added 5 ingredients → verified count → deleted 1 ingredient → confirmed removal (count 4) → added 2 more (total 6) → cleared all → verified empty pantry (count 0). ✅ EDGE CASES TESTED: Non-existent ingredient deletion returns proper 404, empty pantry clear handled gracefully (deleted_count: 0), empty ingredient list returns []. 🎯 CONCLUSION: Both DELETE /api/ingredients/{ingredient_id} and DELETE /api/ingredients/clear/{user_id} endpoints working perfectly. User-reported deletion issues cannot be reproduced - all delete/clear functionality is working correctly."

@@ -1,529 +1,278 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for Prepora Meal Planning App
-Tests all API endpoints with detailed validation
+Critical Delete/Clear Functionality Test
+Testing ingredient delete and clear functionality specifically as requested.
 """
 
 import asyncio
 import aiohttp
 import json
-import time
+import sys
 from datetime import datetime
-from typing import Dict, List, Any
 
-# Test configuration
-BASE_URL = "https://recipe-daily-1.preview.emergentagent.com/api"
-TEST_USER_ID = "test_user_ui_changes_20250308"
+# Backend URL from frontend .env
+BACKEND_URL = "https://recipe-daily-1.preview.emergentagent.com/api"
 
-class TestResults:
+# Test user as specified in the request
+TEST_USER = "test_user_delete_verify_20250308"
+
+class IngredientDeleteClearTest:
     def __init__(self):
-        self.passed = 0
-        self.failed = 0
-        self.results = []
-        self.performance_metrics = {}
-    
-    def add_result(self, test_name: str, passed: bool, details: str, response_time: float = None):
-        status = "✅ PASS" if passed else "❌ FAIL"
-        result = f"{status} {test_name}: {details}"
-        if response_time:
-            result += f" (Response time: {response_time:.2f}s)"
+        self.session = None
+        self.test_results = []
+        self.ingredient_ids = []
         
-        self.results.append(result)
-        if passed:
-            self.passed += 1
-        else:
-            self.failed += 1
+    async def setup(self):
+        """Setup HTTP session"""
+        self.session = aiohttp.ClientSession()
         
-        if response_time:
-            self.performance_metrics[test_name] = response_time
+    async def cleanup(self):
+        """Cleanup HTTP session"""
+        if self.session:
+            await self.session.close()
+            
+    def log_result(self, step, success, message, data=None):
+        """Log test result"""
+        result = {
+            "step": step,
+            "success": success,
+            "message": message,
+            "data": data,
+            "timestamp": datetime.now().isoformat()
+        }
+        self.test_results.append(result)
+        status = "✅" if success else "❌"
+        print(f"{status} Step {step}: {message}")
+        if data:
+            print(f"   Data: {data}")
+        print()
         
-        print(result)
-
-async def make_request(session: aiohttp.ClientSession, method: str, url: str, data: dict = None, timeout: int = 120) -> tuple:
-    """Make HTTP request and return response data and timing"""
-    start_time = time.time()
-    try:
-        if method.upper() == "GET":
-            async with session.get(url, timeout=aiohttp.ClientTimeout(total=timeout)) as response:
-                response_time = time.time() - start_time
-                response_data = await response.json()
-                return response.status, response_data, response_time
-        elif method.upper() == "POST":
-            async with session.post(url, json=data, timeout=aiohttp.ClientTimeout(total=timeout)) as response:
-                response_time = time.time() - start_time
-                response_data = await response.json()
-                return response.status, response_data, response_time
-        elif method.upper() == "DELETE":
-            async with session.delete(url, timeout=aiohttp.ClientTimeout(total=timeout)) as response:
-                response_time = time.time() - start_time
-                response_data = await response.json()
-                return response.status, response_data, response_time
-    except Exception as e:
-        response_time = time.time() - start_time
-        return None, str(e), response_time
-
-async def test_common_ingredients(session: aiohttp.ClientSession, results: TestResults):
-    """Test GET /api/ingredients/common/list"""
-    print("\n=== Testing Common Ingredients ===")
-    
-    status, data, response_time = await make_request(session, "GET", f"{BASE_URL}/ingredients/common/list")
-    
-    if status == 200:
-        ingredients = data.get("ingredients", [])
-        if len(ingredients) >= 48:
-            results.add_result("Common Ingredients List", True, 
-                             f"Retrieved {len(ingredients)} ingredients", response_time)
-        else:
-            results.add_result("Common Ingredients List", False, 
-                             f"Expected 48+ ingredients, got {len(ingredients)}", response_time)
-    else:
-        results.add_result("Common Ingredients List", False, 
-                         f"HTTP {status}: {data}", response_time)
-
-async def test_ingredients_management(session: aiohttp.ClientSession, results: TestResults):
-    """Test ingredients CRUD operations"""
-    print("\n=== Testing Ingredients Management ===")
-    
-    # Test adding ingredients
-    test_ingredients = ["chicken breast", "broccoli", "rice", "olive oil", "garlic"]
-    added_ingredient_ids = []
-    
-    for ingredient in test_ingredients:
-        status, data, response_time = await make_request(
-            session, "POST", f"{BASE_URL}/ingredients/add",
-            {"user_id": TEST_USER_ID, "ingredient_name": ingredient}
+    async def make_request(self, method, endpoint, data=None):
+        """Make HTTP request with error handling"""
+        url = f"{BACKEND_URL}{endpoint}"
+        try:
+            if method == "GET":
+                async with self.session.get(url) as response:
+                    response_data = await response.json()
+                    return response.status, response_data
+            elif method == "POST":
+                async with self.session.post(url, json=data) as response:
+                    response_data = await response.json()
+                    return response.status, response_data
+            elif method == "DELETE":
+                async with self.session.delete(url) as response:
+                    response_data = await response.json()
+                    return response.status, response_data
+        except Exception as e:
+            return None, {"error": str(e)}
+            
+    async def get_ingredient_count(self):
+        """Get current ingredient count for user"""
+        status, data = await self.make_request("GET", f"/ingredients/{TEST_USER}")
+        if status == 200:
+            return len(data)
+        return 0
+        
+    async def get_ingredients_list(self):
+        """Get current ingredients list for user"""
+        status, data = await self.make_request("GET", f"/ingredients/{TEST_USER}")
+        if status == 200:
+            return data
+        return []
+        
+    async def step_1_add_5_ingredients(self):
+        """Step 1: Add 5 ingredients"""
+        ingredients_to_add = ["tomatoes", "onions", "garlic", "chicken", "rice"]
+        
+        for ingredient in ingredients_to_add:
+            status, data = await self.make_request("POST", "/ingredients/add", {
+                "user_id": TEST_USER,
+                "ingredient_name": ingredient
+            })
+            
+            if status == 200:
+                self.ingredient_ids.append(data["id"])
+                
+        count = await self.get_ingredient_count()
+        ingredients_list = await self.get_ingredients_list()
+        ingredient_names = [ing["ingredient_name"] for ing in ingredients_list]
+        
+        success = count == 5
+        self.log_result(
+            1, 
+            success, 
+            f"Added 5 ingredients. Current count: {count}",
+            {"ingredient_names": ingredient_names, "ingredient_ids": self.ingredient_ids}
+        )
+        return success
+        
+    async def step_2_verify_ingredients_appear(self):
+        """Step 2: Verify they appear in GET request"""
+        ingredients_list = await self.get_ingredients_list()
+        count = len(ingredients_list)
+        ingredient_names = [ing["ingredient_name"] for ing in ingredients_list]
+        
+        success = count == 5
+        self.log_result(
+            2,
+            success,
+            f"Verified ingredients in GET request. Count: {count}",
+            {"ingredient_names": ingredient_names}
+        )
+        return success
+        
+    async def step_3_delete_one_ingredient(self):
+        """Step 3: Delete ONE ingredient by ID"""
+        if not self.ingredient_ids:
+            self.log_result(3, False, "No ingredient IDs available for deletion", None)
+            return False
+            
+        ingredient_to_delete = self.ingredient_ids[0]
+        status, data = await self.make_request("DELETE", f"/ingredients/{ingredient_to_delete}")
+        
+        success = status == 200
+        self.log_result(
+            3,
+            success,
+            f"Deleted ingredient {ingredient_to_delete}. Status: {status}",
+            {"response": data, "deleted_id": ingredient_to_delete}
         )
         
-        if status == 200:
-            ingredient_id = data.get("id")
-            if ingredient_id:
-                added_ingredient_ids.append(ingredient_id)
-                results.add_result(f"Add Ingredient ({ingredient})", True, 
-                                 f"Added with ID {ingredient_id}", response_time)
+        if success:
+            self.ingredient_ids.remove(ingredient_to_delete)
+            
+        return success
+        
+    async def step_4_verify_removal(self):
+        """Step 4: Verify it's removed"""
+        count = await self.get_ingredient_count()
+        ingredients_list = await self.get_ingredients_list()
+        ingredient_names = [ing["ingredient_name"] for ing in ingredients_list]
+        
+        success = count == 4
+        self.log_result(
+            4,
+            success,
+            f"Verified ingredient removal. Current count: {count}",
+            {"ingredient_names": ingredient_names}
+        )
+        return success
+        
+    async def step_5_add_2_more_ingredients(self):
+        """Step 5: Add 2 more ingredients (total should be 6)"""
+        additional_ingredients = ["pasta", "cheese"]
+        
+        for ingredient in additional_ingredients:
+            status, data = await self.make_request("POST", "/ingredients/add", {
+                "user_id": TEST_USER,
+                "ingredient_name": ingredient
+            })
+            
+            if status == 200:
+                self.ingredient_ids.append(data["id"])
+                
+        count = await self.get_ingredient_count()
+        ingredients_list = await self.get_ingredients_list()
+        ingredient_names = [ing["ingredient_name"] for ing in ingredients_list]
+        
+        success = count == 6
+        self.log_result(
+            5,
+            success,
+            f"Added 2 more ingredients. Total count: {count}",
+            {"ingredient_names": ingredient_names, "total_ingredient_ids": len(self.ingredient_ids)}
+        )
+        return success
+        
+    async def step_6_clear_all_ingredients(self):
+        """Step 6: Clear ALL ingredients"""
+        status, data = await self.make_request("DELETE", f"/ingredients/clear/{TEST_USER}")
+        
+        success = status == 200
+        self.log_result(
+            6,
+            success,
+            f"Clear all ingredients request. Status: {status}",
+            {"response": data}
+        )
+        return success
+        
+    async def step_7_verify_empty(self):
+        """Step 7: Verify pantry is empty (count = 0)"""
+        count = await self.get_ingredient_count()
+        ingredients_list = await self.get_ingredients_list()
+        
+        success = count == 0
+        self.log_result(
+            7,
+            success,
+            f"Verified pantry is empty. Count: {count}",
+            {"ingredients_list": ingredients_list}
+        )
+        return success
+        
+    async def run_comprehensive_test(self):
+        """Run the complete test sequence as specified"""
+        print("🧪 CRITICAL DELETE/CLEAR FUNCTIONALITY TEST")
+        print("=" * 60)
+        print(f"Test User: {TEST_USER}")
+        print(f"Backend URL: {BACKEND_URL}")
+        print("=" * 60)
+        print()
+        
+        await self.setup()
+        
+        try:
+            # Clear any existing data first
+            await self.make_request("DELETE", f"/ingredients/clear/{TEST_USER}")
+            
+            # Run test sequence
+            step_results = []
+            step_results.append(await self.step_1_add_5_ingredients())
+            step_results.append(await self.step_2_verify_ingredients_appear())
+            step_results.append(await self.step_3_delete_one_ingredient())
+            step_results.append(await self.step_4_verify_removal())
+            step_results.append(await self.step_5_add_2_more_ingredients())
+            step_results.append(await self.step_6_clear_all_ingredients())
+            step_results.append(await self.step_7_verify_empty())
+            
+            # Summary
+            passed_steps = sum(step_results)
+            total_steps = len(step_results)
+            
+            print("=" * 60)
+            print("🔍 DETAILED TEST SUMMARY")
+            print("=" * 60)
+            
+            for i, result in enumerate(self.test_results, 1):
+                status = "✅ PASS" if result["success"] else "❌ FAIL"
+                print(f"Step {result['step']}: {status} - {result['message']}")
+                if result["data"]:
+                    print(f"         Data: {result['data']}")
+                print()
+                
+            print("=" * 60)
+            print(f"📊 OVERALL RESULT: {passed_steps}/{total_steps} steps passed")
+            
+            if passed_steps == total_steps:
+                print("🎉 ALL TESTS PASSED - Delete/Clear functionality working correctly!")
             else:
-                results.add_result(f"Add Ingredient ({ingredient})", False, 
-                                 "No ID returned", response_time)
-        else:
-            results.add_result(f"Add Ingredient ({ingredient})", False, 
-                             f"HTTP {status}: {data}", response_time)
-    
-    # Test duplicate ingredient
-    status, data, response_time = await make_request(
-        session, "POST", f"{BASE_URL}/ingredients/add",
-        {"user_id": TEST_USER_ID, "ingredient_name": "chicken breast"}
-    )
-    
-    if status == 200 and "already exists" in data.get("message", "").lower():
-        results.add_result("Duplicate Ingredient Prevention", True, 
-                         "Correctly prevented duplicate", response_time)
-    else:
-        results.add_result("Duplicate Ingredient Prevention", False, 
-                         f"Expected duplicate prevention, got: {data}", response_time)
-    
-    # Test getting user ingredients
-    status, data, response_time = await make_request(
-        session, "GET", f"{BASE_URL}/ingredients/{TEST_USER_ID}"
-    )
-    
-    if status == 200 and isinstance(data, list):
-        results.add_result("Get User Ingredients", True, 
-                         f"Retrieved {len(data)} ingredients", response_time)
-    else:
-        results.add_result("Get User Ingredients", False, 
-                         f"HTTP {status}: {data}", response_time)
-    
-    # Test deleting ingredients
-    for ingredient_id in added_ingredient_ids[:2]:  # Delete first 2
-        status, data, response_time = await make_request(
-            session, "DELETE", f"{BASE_URL}/ingredients/{ingredient_id}"
-        )
-        
-        if status == 200:
-            results.add_result(f"Delete Ingredient ({ingredient_id})", True, 
-                             "Successfully deleted", response_time)
-        else:
-            results.add_result(f"Delete Ingredient ({ingredient_id})", False, 
-                             f"HTTP {status}: {data}", response_time)
-    
-    # Test deleting non-existent ingredient
-    status, data, response_time = await make_request(
-        session, "DELETE", f"{BASE_URL}/ingredients/non-existent-id"
-    )
-    
-    if status == 404:
-        results.add_result("Delete Non-existent Ingredient", True, 
-                         "Correctly returned 404", response_time)
-    else:
-        results.add_result("Delete Non-existent Ingredient", False, 
-                         f"Expected 404, got HTTP {status}", response_time)
+                print("⚠️  SOME TESTS FAILED - Delete/Clear functionality has issues!")
+                
+            print("=" * 60)
+            
+            return passed_steps == total_steps
+            
+        finally:
+            await self.cleanup()
 
-async def test_clear_all_ingredients(session: aiohttp.ClientSession, results: TestResults):
-    """Test NEW ENDPOINT: Clear All Ingredients"""
-    print("\n=== Testing NEW ENDPOINT: Clear All Ingredients ===")
+async def main():
+    """Main test execution"""
+    test = IngredientDeleteClearTest()
+    success = await test.run_comprehensive_test()
     
-    # First, add multiple ingredients to test clearing
-    test_ingredients = ["tomato", "onion", "bell pepper", "mushroom", "spinach"]
-    
-    for ingredient in test_ingredients:
-        await make_request(
-            session, "POST", f"{BASE_URL}/ingredients/add",
-            {"user_id": TEST_USER_ID, "ingredient_name": ingredient}
-        )
-    
-    # Verify ingredients were added
-    status, data, response_time = await make_request(
-        session, "GET", f"{BASE_URL}/ingredients/{TEST_USER_ID}"
-    )
-    
-    initial_count = len(data) if status == 200 and isinstance(data, list) else 0
-    
-    # Test clearing all ingredients
-    status, data, response_time = await make_request(
-        session, "DELETE", f"{BASE_URL}/ingredients/clear/{TEST_USER_ID}"
-    )
-    
-    if status == 200:
-        deleted_count = data.get("deleted_count", 0)
-        message = data.get("message", "")
-        
-        if "cleared successfully" in message.lower() and deleted_count >= 0:
-            results.add_result("Clear All Ingredients", True, 
-                             f"Cleared {deleted_count} ingredients successfully", response_time)
-        else:
-            results.add_result("Clear All Ingredients", False, 
-                             f"Invalid response format: {data}", response_time)
-    else:
-        results.add_result("Clear All Ingredients", False, 
-                         f"HTTP {status}: {data}", response_time)
-    
-    # Verify pantry is empty after clearing
-    status, data, response_time = await make_request(
-        session, "GET", f"{BASE_URL}/ingredients/{TEST_USER_ID}"
-    )
-    
-    if status == 200 and isinstance(data, list) and len(data) == 0:
-        results.add_result("Verify Empty Pantry After Clear", True, 
-                         "Pantry is empty after clearing", response_time)
-    else:
-        results.add_result("Verify Empty Pantry After Clear", False, 
-                         f"Expected empty pantry, got {len(data) if isinstance(data, list) else 'error'} ingredients", response_time)
-    
-    # Test clearing empty pantry (should return 0)
-    status, data, response_time = await make_request(
-        session, "DELETE", f"{BASE_URL}/ingredients/clear/{TEST_USER_ID}"
-    )
-    
-    if status == 200:
-        deleted_count = data.get("deleted_count", -1)
-        if deleted_count == 0:
-            results.add_result("Clear Empty Pantry", True, 
-                             "Correctly returned 0 for empty pantry", response_time)
-        else:
-            results.add_result("Clear Empty Pantry", False, 
-                             f"Expected 0 deleted_count, got {deleted_count}", response_time)
-    else:
-        results.add_result("Clear Empty Pantry", False, 
-                         f"HTTP {status}: {data}", response_time)
-
-async def test_meal_plan_generation(session: aiohttp.ClientSession, results: TestResults):
-    """Test AI-powered meal plan generation"""
-    print("\n=== Testing Meal Plan Generation ===")
-    
-    # Test daily healthy meal plan
-    print("Testing daily healthy meal plan...")
-    status, data, response_time = await make_request(
-        session, "POST", f"{BASE_URL}/meal-plan/generate",
-        {
-            "user_id": TEST_USER_ID,
-            "plan_type": "daily",
-            "cuisine_type": "healthy",
-            "available_ingredients": ["chicken", "broccoli", "rice"]
-        },
-        timeout=180  # 3 minutes for AI generation
-    )
-    
-    daily_plan_id = None
-    if status == 200:
-        plan_id = data.get("id")
-        meals = data.get("meals", {})
-        
-        # Validate meal structure
-        required_meals = ["breakfast", "lunch", "dinner"]
-        valid_structure = all(meal in meals for meal in required_meals)
-        
-        if valid_structure and plan_id:
-            daily_plan_id = plan_id
-            results.add_result("Daily Healthy Meal Plan", True, 
-                             f"Generated with proper structure, ID: {plan_id}", response_time)
-        else:
-            results.add_result("Daily Healthy Meal Plan", False, 
-                             f"Invalid structure or missing ID", response_time)
-    else:
-        results.add_result("Daily Healthy Meal Plan", False, 
-                         f"HTTP {status}: {data}", response_time)
-    
-    # Test daily comfort meal plan
-    print("Testing daily comfort meal plan...")
-    status, data, response_time = await make_request(
-        session, "POST", f"{BASE_URL}/meal-plan/generate",
-        {
-            "user_id": TEST_USER_ID,
-            "plan_type": "daily",
-            "cuisine_type": "comfort"
-        },
-        timeout=180
-    )
-    
-    if status == 200:
-        plan_id = data.get("id")
-        meals = data.get("meals", {})
-        required_meals = ["breakfast", "lunch", "dinner"]
-        valid_structure = all(meal in meals for meal in required_meals)
-        
-        if valid_structure and plan_id:
-            results.add_result("Daily Comfort Meal Plan", True, 
-                             f"Generated with proper structure, ID: {plan_id}", response_time)
-        else:
-            results.add_result("Daily Comfort Meal Plan", False, 
-                             f"Invalid structure or missing ID", response_time)
-    else:
-        results.add_result("Daily Comfort Meal Plan", False, 
-                         f"HTTP {status}: {data}", response_time)
-    
-    # Test weekly healthy meal plan (note: may timeout due to proxy limits)
-    print("Testing weekly healthy meal plan...")
-    status, data, response_time = await make_request(
-        session, "POST", f"{BASE_URL}/meal-plan/generate",
-        {
-            "user_id": TEST_USER_ID,
-            "plan_type": "weekly",
-            "cuisine_type": "healthy"
-        },
-        timeout=180
-    )
-    
-    weekly_plan_id = None
-    if status == 200:
-        plan_id = data.get("id")
-        meals = data.get("meals", {})
-        
-        # Check for weekly structure (days of week)
-        days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-        valid_weekly = any(day in meals for day in days)
-        
-        if valid_weekly and plan_id:
-            weekly_plan_id = plan_id
-            results.add_result("Weekly Healthy Meal Plan", True, 
-                             f"Generated with weekly structure, ID: {plan_id}", response_time)
-        else:
-            results.add_result("Weekly Healthy Meal Plan", False, 
-                             f"Invalid weekly structure or missing ID", response_time)
-    else:
-        # Weekly plans may timeout due to proxy limits, but backend processes successfully
-        if "timeout" in str(data).lower() or response_time > 60:
-            results.add_result("Weekly Healthy Meal Plan", True, 
-                             f"Proxy timeout expected for long AI generation (backend processes successfully)", response_time)
-        else:
-            results.add_result("Weekly Healthy Meal Plan", False, 
-                             f"HTTP {status}: {data}", response_time)
-    
-    return daily_plan_id, weekly_plan_id
-
-async def test_meal_plans_retrieval(session: aiohttp.ClientSession, results: TestResults):
-    """Test meal plans retrieval and management"""
-    print("\n=== Testing Meal Plans Retrieval ===")
-    
-    # Get all meal plans for user
-    status, data, response_time = await make_request(
-        session, "GET", f"{BASE_URL}/meal-plans/{TEST_USER_ID}"
-    )
-    
-    plan_ids = []
-    if status == 200 and isinstance(data, list):
-        plan_ids = [plan.get("id") for plan in data if plan.get("id")]
-        results.add_result("Get User Meal Plans", True, 
-                         f"Retrieved {len(data)} meal plans", response_time)
-    else:
-        results.add_result("Get User Meal Plans", False, 
-                         f"HTTP {status}: {data}", response_time)
-    
-    return plan_ids
-
-async def test_meal_plan_deletion(session: aiohttp.ClientSession, results: TestResults, plan_ids: List[str]):
-    """Test meal plan deletion"""
-    print("\n=== Testing Meal Plan Deletion ===")
-    
-    if plan_ids:
-        # Delete first plan
-        plan_id = plan_ids[0]
-        status, data, response_time = await make_request(
-            session, "DELETE", f"{BASE_URL}/meal-plans/{plan_id}"
-        )
-        
-        if status == 200:
-            results.add_result("Delete Meal Plan", True, 
-                             f"Successfully deleted plan {plan_id}", response_time)
-        else:
-            results.add_result("Delete Meal Plan", False, 
-                             f"HTTP {status}: {data}", response_time)
-    
-    # Test deleting non-existent plan
-    status, data, response_time = await make_request(
-        session, "DELETE", f"{BASE_URL}/meal-plans/non-existent-id"
-    )
-    
-    if status == 404:
-        results.add_result("Delete Non-existent Meal Plan", True, 
-                         "Correctly returned 404", response_time)
-    else:
-        results.add_result("Delete Non-existent Meal Plan", False, 
-                         f"Expected 404, got HTTP {status}", response_time)
-
-async def test_favorites_system(session: aiohttp.ClientSession, results: TestResults):
-    """Test favorites CRUD operations"""
-    print("\n=== Testing Favorites System ===")
-    
-    # Create test recipe
-    test_recipe = {
-        "name": "Grilled Chicken with Vegetables",
-        "meal_type": "dinner",
-        "cuisine_type": "healthy",
-        "ingredients": ["chicken breast", "broccoli", "olive oil", "garlic"],
-        "instructions": ["Season chicken", "Grill for 6-8 minutes", "Steam broccoli", "Serve together"],
-        "prep_time": "10 minutes",
-        "cook_time": "15 minutes",
-        "servings": 2
-    }
-    
-    # Add recipe to favorites
-    status, data, response_time = await make_request(
-        session, "POST", f"{BASE_URL}/favorites/add",
-        {"user_id": TEST_USER_ID, "recipe": test_recipe}
-    )
-    
-    favorite_id = None
-    if status == 200:
-        favorite_id = data.get("id")
-        if favorite_id:
-            results.add_result("Add Recipe to Favorites", True, 
-                             f"Added with ID {favorite_id}", response_time)
-        else:
-            results.add_result("Add Recipe to Favorites", False, 
-                             "No ID returned", response_time)
-    else:
-        results.add_result("Add Recipe to Favorites", False, 
-                         f"HTTP {status}: {data}", response_time)
-    
-    # Get user favorites
-    status, data, response_time = await make_request(
-        session, "GET", f"{BASE_URL}/favorites/{TEST_USER_ID}"
-    )
-    
-    if status == 200 and isinstance(data, list):
-        results.add_result("Get User Favorites", True, 
-                         f"Retrieved {len(data)} favorites", response_time)
-    else:
-        results.add_result("Get User Favorites", False, 
-                         f"HTTP {status}: {data}", response_time)
-    
-    # Delete favorite
-    if favorite_id:
-        status, data, response_time = await make_request(
-            session, "DELETE", f"{BASE_URL}/favorites/{favorite_id}"
-        )
-        
-        if status == 200:
-            results.add_result("Delete Favorite", True, 
-                             f"Successfully deleted favorite {favorite_id}", response_time)
-        else:
-            results.add_result("Delete Favorite", False, 
-                             f"HTTP {status}: {data}", response_time)
-    
-    # Test deleting non-existent favorite
-    status, data, response_time = await make_request(
-        session, "DELETE", f"{BASE_URL}/favorites/non-existent-id"
-    )
-    
-    if status == 404:
-        results.add_result("Delete Non-existent Favorite", True, 
-                         "Correctly returned 404", response_time)
-    else:
-        results.add_result("Delete Non-existent Favorite", False, 
-                         f"Expected 404, got HTTP {status}", response_time)
-
-async def test_error_handling(session: aiohttp.ClientSession, results: TestResults):
-    """Test error handling for invalid requests"""
-    print("\n=== Testing Error Handling ===")
-    
-    # Test invalid user ID format
-    status, data, response_time = await make_request(
-        session, "GET", f"{BASE_URL}/ingredients/"
-    )
-    
-    if status in [404, 422]:  # Not found or validation error
-        results.add_result("Invalid User ID Handling", True, 
-                         f"Correctly handled invalid user ID with HTTP {status}", response_time)
-    else:
-        results.add_result("Invalid User ID Handling", False, 
-                         f"Expected 404/422, got HTTP {status}", response_time)
-    
-    # Test malformed meal plan request
-    status, data, response_time = await make_request(
-        session, "POST", f"{BASE_URL}/meal-plan/generate",
-        {"user_id": TEST_USER_ID}  # Missing required fields
-    )
-    
-    if status in [400, 422]:  # Bad request or validation error
-        results.add_result("Malformed Request Handling", True, 
-                         f"Correctly handled malformed request with HTTP {status}", response_time)
-    else:
-        results.add_result("Malformed Request Handling", False, 
-                         f"Expected 400/422, got HTTP {status}", response_time)
-
-async def run_comprehensive_tests():
-    """Run all comprehensive tests"""
-    print("🚀 Starting Comprehensive Backend Testing for Prepora Meal Planning App")
-    print(f"📍 Base URL: {BASE_URL}")
-    print(f"👤 Test User ID: {TEST_USER_ID}")
-    print(f"⏰ Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    
-    results = TestResults()
-    
-    async with aiohttp.ClientSession() as session:
-        # Test all endpoints
-        await test_common_ingredients(session, results)
-        await test_ingredients_management(session, results)
-        await test_clear_all_ingredients(session, results)  # NEW TEST
-        daily_plan_id, weekly_plan_id = await test_meal_plan_generation(session, results)
-        plan_ids = await test_meal_plans_retrieval(session, results)
-        await test_meal_plan_deletion(session, results, plan_ids)
-        await test_favorites_system(session, results)
-        await test_error_handling(session, results)
-    
-    # Print summary
-    print("\n" + "="*80)
-    print("📊 COMPREHENSIVE TEST RESULTS SUMMARY")
-    print("="*80)
-    
-    for result in results.results:
-        print(result)
-    
-    print(f"\n📈 OVERALL RESULTS:")
-    print(f"✅ Passed: {results.passed}")
-    print(f"❌ Failed: {results.failed}")
-    print(f"📊 Success Rate: {(results.passed / (results.passed + results.failed) * 100):.1f}%")
-    
-    print(f"\n⚡ PERFORMANCE METRICS:")
-    for test_name, response_time in results.performance_metrics.items():
-        if "AI" in test_name or "Meal Plan" in test_name:
-            status = "🟡 Expected" if response_time > 10 else "🟢 Fast"
-        else:
-            status = "🟢 Good" if response_time < 0.5 else "🟡 Slow" if response_time < 2 else "🔴 Very Slow"
-        print(f"  {test_name}: {response_time:.2f}s {status}")
-    
-    print(f"\n⏰ Completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    
-    return results
+    if not success:
+        sys.exit(1)
 
 if __name__ == "__main__":
-    asyncio.run(run_comprehensive_tests())
+    asyncio.run(main())

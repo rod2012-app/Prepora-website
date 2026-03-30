@@ -84,6 +84,21 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* My Pantry - Primary Action at Top */}
+        <TouchableOpacity
+          style={styles.topPrimaryActionButton}
+          onPress={() => router.push('/ingredients')}
+        >
+          <View style={styles.topActionIconContainer}>
+            <MaterialCommunityIcons name="basket-plus-outline" size={32} color="#fff" />
+          </View>
+          <View style={styles.topActionTextContainer}>
+            <Text style={styles.topActionTitle}>My Pantry</Text>
+            <Text style={styles.topActionSubtitle}>Add ingredients first to get started</Text>
+          </View>
+          <MaterialCommunityIcons name="chevron-right" size={24} color="#fff" />
+        </TouchableOpacity>
+
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.iconContainer}>
@@ -224,14 +239,6 @@ export default function HomeScreen() {
         </TouchableOpacity>
 
         {/* Quick Actions */}
-        <TouchableOpacity
-          style={styles.primaryActionButton}
-          onPress={() => router.push('/ingredients')}
-        >
-          <MaterialCommunityIcons name="basket-plus" size={24} color="#fff" />
-          <Text style={styles.primaryActionText}>My Pantry - Add Ingredients First</Text>
-        </TouchableOpacity>
-
         <View style={styles.quickActions}>
           <TouchableOpacity
             style={styles.quickActionCard}
@@ -268,6 +275,41 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 20,
     paddingBottom: 40,
+  },
+  topPrimaryActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#FF9B85',
+    borderRadius: 20,
+    marginBottom: 24,
+    shadowColor: '#FF9B85',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  topActionIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  topActionTextContainer: {
+    flex: 1,
+  },
+  topActionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  topActionSubtitle: {
+    fontSize: 13,
+    color: 'rgba(255, 255, 255, 0.9)',
   },
   header: {
     alignItems: 'center',
@@ -440,25 +482,5 @@ const styles = StyleSheet.create({
   quickActionSubtitle: {
     fontSize: 12,
     color: '#999',
-  },
-  primaryActionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 12,
-    padding: 18,
-    backgroundColor: '#FF9B85',
-    borderRadius: 16,
-    marginBottom: 16,
-    shadowColor: '#FF9B85',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  primaryActionText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#fff',
   },
 });
