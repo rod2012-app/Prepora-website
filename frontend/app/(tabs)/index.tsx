@@ -84,7 +84,19 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* My Pantry - Primary Action at Top */}
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.iconContainer}>
+            <MaterialCommunityIcons name="food" size={32} color="#FF9B85" />
+          </View>
+          <Text style={styles.appName}>Prepora</Text>
+          <Text style={styles.tagline}>Plan smart. Eat better. Live easier.</Text>
+          <View style={styles.divider} />
+          <Text style={styles.greeting}>Good day!</Text>
+          <Text style={styles.title}>Let's plan your meals</Text>
+        </View>
+
+        {/* My Pantry - Primary Action */}
         <TouchableOpacity
           style={styles.topPrimaryActionButton}
           onPress={() => router.push('/ingredients')}
@@ -98,18 +110,6 @@ export default function HomeScreen() {
           </View>
           <MaterialCommunityIcons name="chevron-right" size={24} color="#fff" />
         </TouchableOpacity>
-
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.iconContainer}>
-            <MaterialCommunityIcons name="food" size={32} color="#FF9B85" />
-          </View>
-          <Text style={styles.appName}>Prepora</Text>
-          <Text style={styles.tagline}>Plan smart. Eat better. Live easier.</Text>
-          <View style={styles.divider} />
-          <Text style={styles.greeting}>Good day!</Text>
-          <Text style={styles.title}>Let's plan your meals</Text>
-        </View>
 
         {/* Plan Type Card */}
         <View style={styles.card}>
