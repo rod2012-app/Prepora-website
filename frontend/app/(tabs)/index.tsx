@@ -224,18 +224,15 @@ export default function HomeScreen() {
         </TouchableOpacity>
 
         {/* Quick Actions */}
-        <View style={styles.quickActions}>
-          <TouchableOpacity
-            style={styles.quickActionCard}
-            onPress={() => router.push('/ingredients')}
-          >
-            <View style={styles.quickActionIcon}>
-              <MaterialCommunityIcons name="basket" size={28} color="#FF9B85" />
-            </View>
-            <Text style={styles.quickActionTitle}>My Pantry</Text>
-            <Text style={styles.quickActionSubtitle}>Manage ingredients</Text>
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.primaryActionButton}
+          onPress={() => router.push('/ingredients')}
+        >
+          <MaterialCommunityIcons name="basket-plus" size={24} color="#fff" />
+          <Text style={styles.primaryActionText}>My Pantry - Add Ingredients First</Text>
+        </TouchableOpacity>
 
+        <View style={styles.quickActions}>
           <TouchableOpacity
             style={styles.quickActionCard}
             onPress={() => router.push('/meal-plans')}
@@ -245,6 +242,17 @@ export default function HomeScreen() {
             </View>
             <Text style={styles.quickActionTitle}>My Plans</Text>
             <Text style={styles.quickActionSubtitle}>View all plans</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.quickActionCard}
+            onPress={() => router.push('/favorites')}
+          >
+            <View style={styles.quickActionIcon}>
+              <MaterialCommunityIcons name="heart" size={28} color="#FFB5A0" />
+            </View>
+            <Text style={styles.quickActionTitle}>Favorites</Text>
+            <Text style={styles.quickActionSubtitle}>Saved recipes</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -432,5 +440,25 @@ const styles = StyleSheet.create({
   quickActionSubtitle: {
     fontSize: 12,
     color: '#999',
+  },
+  primaryActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    padding: 18,
+    backgroundColor: '#FF9B85',
+    borderRadius: 16,
+    marginBottom: 16,
+    shadowColor: '#FF9B85',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  primaryActionText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#fff',
   },
 });

@@ -117,6 +117,30 @@ export default function IngredientsScreen() {
     );
   };
 
+  const clearAllIngredients = async () => {
+    Alert.alert(
+      'Clear All Ingredients',
+      `Remove all ${ingredients.length} ingredients from your pantry?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Clear All',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await axios.delete(`${BACKEND_URL}/api/ingredients/clear/${userId}`);
+              fetchIngredients();
+              Alert.alert('Success', 'All ingredients cleared');
+            } catch (error) {
+              console.error('Error clearing ingredients:', error);
+              Alert.alert('Error', 'Failed to clear ingredients');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const filterIngredients = (text: string) => {
     setNewIngredient(text);
     if (text.trim() === '') {
@@ -171,12 +195,22 @@ export default function IngredientsScreen() {
             {ingredients.length} {ingredients.length === 1 ? 'ingredient' : 'ingredients'}
           </Text>
         </View>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => setShowAddModal(true)}
-        >
-          <MaterialCommunityIcons name="plus" size={24} color="#fff" />
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          {ingredients.length > 0 && (
+            <TouchableOpacity
+              style={styles.clearAllButton}
+              onPress={clearAllIngredients}
+            >
+              <MaterialCommunityIcons name="delete-sweep" size={20} color="#FFB5A0" />
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => setShowAddModal(true)}
+          >
+            <MaterialCommunityIcons name="plus" size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {ingredients.length === 0 ? (
@@ -269,6 +303,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     paddingTop: 16,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  clearAllButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#FFF5F3',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#FFE5E0',
   },
   title: {
     fontSize: 32,

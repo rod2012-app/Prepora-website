@@ -13,7 +13,7 @@ from typing import Dict, List, Any
 
 # Test configuration
 BASE_URL = "https://recipe-daily-1.preview.emergentagent.com/api"
-TEST_USER_ID = "test_user_comprehensive_20250308"
+TEST_USER_ID = "test_user_ui_changes_20250308"
 
 class TestResults:
     def __init__(self):
@@ -156,6 +156,74 @@ async def test_ingredients_management(session: aiohttp.ClientSession, results: T
     else:
         results.add_result("Delete Non-existent Ingredient", False, 
                          f"Expected 404, got HTTP {status}", response_time)
+
+async def test_clear_all_ingredients(session: aiohttp.ClientSession, results: TestResults):
+    """Test NEW ENDPOINT: Clear All Ingredients"""
+    print("\n=== Testing NEW ENDPOINT: Clear All Ingredients ===")
+    
+    # First, add multiple ingredients to test clearing
+    test_ingredients = ["tomato", "onion", "bell pepper", "mushroom", "spinach"]
+    
+    for ingredient in test_ingredients:
+        await make_request(
+            session, "POST", f"{BASE_URL}/ingredients/add",
+            {"user_id": TEST_USER_ID, "ingredient_name": ingredient}
+        )
+    
+    # Verify ingredients were added
+    status, data, response_time = await make_request(
+        session, "GET", f"{BASE_URL}/ingredients/{TEST_USER_ID}"
+    )
+    
+    initial_count = len(data) if status == 200 and isinstance(data, list) else 0
+    
+    # Test clearing all ingredients
+    status, data, response_time = await make_request(
+        session, "DELETE", f"{BASE_URL}/ingredients/clear/{TEST_USER_ID}"
+    )
+    
+    if status == 200:
+        deleted_count = data.get("deleted_count", 0)
+        message = data.get("message", "")
+        
+        if "cleared successfully" in message.lower() and deleted_count >= 0:
+            results.add_result("Clear All Ingredients", True, 
+                             f"Cleared {deleted_count} ingredients successfully", response_time)
+        else:
+            results.add_result("Clear All Ingredients", False, 
+                             f"Invalid response format: {data}", response_time)
+    else:
+        results.add_result("Clear All Ingredients", False, 
+                         f"HTTP {status}: {data}", response_time)
+    
+    # Verify pantry is empty after clearing
+    status, data, response_time = await make_request(
+        session, "GET", f"{BASE_URL}/ingredients/{TEST_USER_ID}"
+    )
+    
+    if status == 200 and isinstance(data, list) and len(data) == 0:
+        results.add_result("Verify Empty Pantry After Clear", True, 
+                         "Pantry is empty after clearing", response_time)
+    else:
+        results.add_result("Verify Empty Pantry After Clear", False, 
+                         f"Expected empty pantry, got {len(data) if isinstance(data, list) else 'error'} ingredients", response_time)
+    
+    # Test clearing empty pantry (should return 0)
+    status, data, response_time = await make_request(
+        session, "DELETE", f"{BASE_URL}/ingredients/clear/{TEST_USER_ID}"
+    )
+    
+    if status == 200:
+        deleted_count = data.get("deleted_count", -1)
+        if deleted_count == 0:
+            results.add_result("Clear Empty Pantry", True, 
+                             "Correctly returned 0 for empty pantry", response_time)
+        else:
+            results.add_result("Clear Empty Pantry", False, 
+                             f"Expected 0 deleted_count, got {deleted_count}", response_time)
+    else:
+        results.add_result("Clear Empty Pantry", False, 
+                         f"HTTP {status}: {data}", response_time)
 
 async def test_meal_plan_generation(session: aiohttp.ClientSession, results: TestResults):
     """Test AI-powered meal plan generation"""
@@ -425,6 +493,7 @@ async def run_comprehensive_tests():
         # Test all endpoints
         await test_common_ingredients(session, results)
         await test_ingredients_management(session, results)
+        await test_clear_all_ingredients(session, results)  # NEW TEST
         daily_plan_id, weekly_plan_id = await test_meal_plan_generation(session, results)
         plan_ids = await test_meal_plans_retrieval(session, results)
         await test_meal_plan_deletion(session, results, plan_ids)

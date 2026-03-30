@@ -289,6 +289,19 @@ async def delete_ingredient(ingredient_id: str):
         logger.error(f"Error deleting ingredient: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.delete("/ingredients/clear/{user_id}")
+async def clear_all_ingredients(user_id: str):
+    """Clear all ingredients for a user"""
+    try:
+        result = await db.user_ingredients.delete_many({"user_id": user_id})
+        return {
+            "message": "All ingredients cleared successfully",
+            "deleted_count": result.deleted_count
+        }
+    except Exception as e:
+        logger.error(f"Error clearing ingredients: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/ingredients/common/list")
 async def get_common_ingredients():
     """Get a list of common ingredients"""
