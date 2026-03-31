@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Prepora</title>
+    <meta name="description" content="Learn about Prepora - the AI-powered meal planning app that helps you eat better and stress less.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .page-hero {
+            padding: 8rem 0 4rem;
+            background: linear-gradient(135deg, #FFF5F3 0%, #F0F5F0 100%);
+            margin-top: 70px;
+            text-align: center;
+        }
+        .page-hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .page-hero p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .about-section {
+            padding: 4rem 0 6rem;
+        }
+        .about-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .about-block {
+            margin-bottom: 4rem;
+        }
+        .about-block h2 {
+            font-size: 2rem;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .about-block p {
+            font-size: 1.1rem;
+            line-height: 1.9;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+        .story-card {
+            background: white;
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 3rem;
+        }
+        .story-card h3 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .value-card {
+            background: var(--bg-cream);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+        }
+        .value-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .value-card h4 {
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        .value-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+        .team-note {
+            background: linear-gradient(135deg, #FFF5F3 0%, #F0F5F0 100%);
+            padding: 3rem;
+            border-radius: 24px;
+            text-align: center;
+        }
+        .team-note h3 {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+        .team-note p {
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        @media (max-width: 768px) {
+            .page-hero h1 {
+                font-size: 2rem;
+            }
+            .story-card {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="nav-brand">
+                <span class="logo-icon">🍽️</span>
+                <span class="logo-text">Prepora</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html#features">Features</a>
+                <a href="index.html#how-it-works">How It Works</a>
+                <a href="contact.html">Contact</a>
+                <a href="index.html#download" class="btn-primary">Download Now</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Hero -->
+    <section class="page-hero">
+        <div class="container">
+            <h1>About Prepora</h1>
+            <p>We're on a mission to make healthy eating simple, enjoyable, and accessible for everyone.</p>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section">
+        <div class="container">
+            <div class="about-content">
+                
+                <div class="story-card">
+                    <h3>Our Story</h3>
+                    <p>Prepora was born from a simple frustration that we all know too well: the daily struggle of deciding what to eat. After countless evenings staring at the refrigerator wondering what to cook, and too many last-minute takeout orders, we knew there had to be a better way.</p>
+                    <p>We envisioned an app that could understand what ingredients you have on hand, respect your dietary preferences, and instantly generate delicious meal plans complete with step-by-step recipes. With the power of AI, we turned that vision into reality.</p>
+                </div>
+
+                <div class="about-block">
+                    <h2>🎯 What We Believe</h2>
+                    <p>We believe that eating well shouldn't be complicated. Whether you're a busy professional, a parent juggling multiple responsibilities, or someone just starting their cooking journey, everyone deserves access to simple, personalized meal planning.</p>
+                    <p>Good food brings people together, nourishes our bodies, and brightens our days. Prepora is designed to remove the stress of meal planning so you can focus on what really matters - enjoying the food you eat and the moments you share.</p>
+                </div>
+
+                <div class="about-block">
+                    <h2>💡 The Idea Behind Prepora</h2>
+                    <p>The name "Prepora" comes from "Prepare" - because we're here to help you prepare smarter. Our AI-powered technology analyzes your available ingredients and preferences to create personalized meal plans in seconds.</p>
+                    <p>Whether you're craving something fresh and healthy or seeking the comfort of a hearty meal, Prepora adapts to your mood. Plan for a single day or an entire week - it's flexible meal planning that fits your lifestyle, not the other way around.</p>
+                </div>
+
+                <div class="values-grid">
+                    <div class="value-card">
+                        <div class="value-icon">🌱</div>
+                        <h4>Simplicity</h4>
+                        <p>Making healthy eating effortless and accessible for everyone</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">🤖</div>
+                        <h4>Innovation</h4>
+                        <p>Using AI to personalize your meal planning experience</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">💚</div>
+                        <h4>Sustainability</h4>
+                        <p>Reducing food waste by using what you already have</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">🤝</div>
+                        <h4>Community</h4>
+                        <p>Building a community of mindful, happy eaters</p>
+                    </div>
+                </div>
+
+                <div class="team-note">
+                    <h3>Made with Love</h3>
+                    <p>Prepora is crafted by a passionate team who believes that technology should make life easier, not more complicated. We're constantly improving and would love to hear your feedback!</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo-icon">🍽️</span>
+                    <span class="logo-text">Prepora</span>
+                    <p>Plan smart. Eat better. Live easier.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Product</h4>
+                        <a href="index.html#features">Features</a>
+                        <a href="index.html#how-it-works">How It Works</a>
+                        <a href="index.html#download">Download</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Company</h4>
+                        <a href="about.html">About Us</a>
+                        <a href="contact.html">Contact</a>
+                        <a href="privacy.html">Privacy Policy</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Connect</h4>
+                        <a href="https://www.instagram.com/prepora_app/" target="_blank">Instagram</a>
+                        <a href="mailto:prepora.food@gmail.com">Email Us</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Prepora. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
