@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Prepora",
+    "name": "Prepora - AI Meal Planner",
     "slug": "prepora",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,7 +8,7 @@
     "scheme": "prepora",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "description": "AI-powered meal planning app. Plan smart. Eat better. Live easier.",
+    "description": "Prepora is your AI-powered meal planner and recipe organizer. Generate personalized daily or weekly meal plans based on ingredients in your pantry. Features smart grocery tracking, healthy eating suggestions, comfort food recipes, and a favorites cookbook. Perfect for meal prep, reducing food waste, and simplifying your cooking routine. Plan smart. Eat better. Live easier.",
     "primaryColor": "#FF9B85",
     "splash": {
       "image": "./assets/images/splash-image.png",
