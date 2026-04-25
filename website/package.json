@@ -7,7 +7,14 @@
     "dev": "npx serve .",
     "build": "echo 'Static site - no build needed'"
   },
-  "keywords": ["meal-planning", "prepora", "static-website"],
+  "keywords": [
+    "meal-planning",
+    "prepora",
+    "static-website"
+  ],
   "author": "Prepora Team",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
 }
