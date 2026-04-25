@@ -9,7 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useOnboarding } from './_layout';
 
 const { width, height } = Dimensions.get('window');
 
@@ -64,16 +64,12 @@ const onboardingData: SlideData[] = [
 
 export default function OnboardingScreen() {
   const router = useRouter();
+  const { completeOnboarding } = useOnboarding();
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const handleComplete = async () => {
-    try {
-      await AsyncStorage.setItem('hasCompletedOnboarding', 'true');
-      router.replace('/(tabs)');
-    } catch (error) {
-      console.error('Error saving onboarding status:', error);
-      router.replace('/(tabs)');
-    }
+    await completeOnboarding();
+    // The _layout.tsx will automatically redirect to (tabs) after state updates
   };
 
   const handleSkip = () => {
