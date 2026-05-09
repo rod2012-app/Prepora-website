@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  Image,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -17,6 +19,9 @@ import { format } from 'date-fns';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
+// Food image categories for Foodish API
+const FOOD_CATEGORIES = ['pizza', 'burger', 'pasta', 'rice', 'biryani', 'dessert'];
+
 interface MealPlan {
   id: string;
   plan_type: string;
@@ -25,11 +30,36 @@ interface MealPlan {
   created_at: string;
 }
 
+// Generate a consistent food image URL based on meal name
+const getFoodImageUrl = (mealName: string, mealType: string): string => {
+  // Use a hash of the meal name to consistently get the same image
+  const hash = mealName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const categoryIndex = hash % FOOD_CATEGORIES.length;
+  const imageNumber = (hash % 20) + 1; // Each category has about 20 images
+  
+  // Map meal types to better categories
+  let category = FOOD_CATEGORIES[categoryIndex];
+  if (mealType === 'breakfast') {
+    category = 'dessert'; // Breakfast items often look like desserts/pastries
+  } else if (mealName.toLowerCase().includes('pasta') || mealName.toLowerCase().includes('spaghetti')) {
+    category = 'pasta';
+  } else if (mealName.toLowerCase().includes('rice') || mealName.toLowerCase().includes('biryani')) {
+    category = 'rice';
+  } else if (mealName.toLowerCase().includes('pizza')) {
+    category = 'pizza';
+  } else if (mealName.toLowerCase().includes('burger')) {
+    category = 'burger';
+  }
+  
+  return `https://foodish-api.com/images/${category}/${category}${imageNumber}.jpg`;
+};
+
 export default function MealPlansScreen() {
   const router = useRouter();
   const [userId, setUserId] = useState('');
   const [mealPlans, setMealPlans] = useState<MealPlan[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     initializeUser();
@@ -62,8 +92,14 @@ export default function MealPlansScreen() {
       console.error('Error fetching meal plans:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchMealPlans();
+  }, [userId]);
 
   const deleteMealPlan = async (planId: string) => {
     Alert.alert(
@@ -109,17 +145,30 @@ export default function MealPlansScreen() {
         ? 'food-fork-drink'
         : 'food-turkey';
 
+    const imageUrl = getFoodImageUrl(recipe.name || 'food', mealType);
+
     return (
       <TouchableOpacity
         style={styles.mealCard}
         onPress={() => viewRecipe(recipe, mealType, day)}
       >
-        <View style={styles.mealIcon}>
-          <MaterialCommunityIcons name={iconName} size={20} color="#FF9B85" />
-        </View>
-        <View style={styles.mealContent}>
-          <Text style={styles.mealType}>{mealType}</Text>
-          <Text style={styles.recipeName}>{recipe.name}</Text>
+        {/* Meal Image */}
+        <Image
+          source={{ uri: imageUrl }}
+          style={styles.mealImage}
+          defaultSource={require('../../assets/images/icon.png')}
+        />
+        
+        <View style={styles.mealCardContent}>
+          <View style={styles.mealTypeRow}>
+            <View style={styles.mealIcon}>
+              <MaterialCommunityIcons name={iconName} size={16} color="#FF9B85" />
+            </View>
+            <Text style={styles.mealType}>{mealType}</Text>
+          </View>
+          
+          <Text style={styles.recipeName} numberOfLines={2}>{recipe.name}</Text>
+          
           <View style={styles.recipeInfo}>
             <View style={styles.infoItem}>
               <MaterialCommunityIcons name="clock-outline" size={12} color="#BBB" />
@@ -131,6 +180,7 @@ export default function MealPlansScreen() {
             </View>
           </View>
         </View>
+        
         <MaterialCommunityIcons name="chevron-right" size={20} color="#DDD" />
       </TouchableOpacity>
     );
@@ -203,6 +253,9 @@ export default function MealPlansScreen() {
             {mealPlans.length} {mealPlans.length === 1 ? 'plan' : 'plans'}
           </Text>
         </View>
+        <TouchableOpacity onPress={onRefresh} style={styles.refreshButton}>
+          <MaterialCommunityIcons name="refresh" size={24} color="#FF9B85" />
+        </TouchableOpacity>
       </View>
 
       {mealPlans.length === 0 ? (
@@ -226,6 +279,14 @@ export default function MealPlansScreen() {
           renderItem={renderMealPlan}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={['#FF9B85']}
+              tintColor="#FF9B85"
+            />
+          }
         />
       )}
     </SafeAreaView>
@@ -244,6 +305,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEFEFE',
   },
   header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     padding: 20,
     paddingTop: 16,
   },
@@ -256,6 +320,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#999',
     marginTop: 4,
+  },
+  refreshButton: {
+    padding: 8,
   },
   listContent: {
     padding: 20,
@@ -325,24 +392,35 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginBottom: 8,
   },
+  mealImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 12,
+    backgroundColor: '#E8E8E8',
+    marginRight: 12,
+  },
+  mealCardContent: {
+    flex: 1,
+  },
+  mealTypeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
   mealIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     backgroundColor: '#FFF5F3',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
-  },
-  mealContent: {
-    flex: 1,
+    marginRight: 6,
   },
   mealType: {
     fontSize: 11,
     fontWeight: '600',
     color: '#BBB',
     textTransform: 'uppercase',
-    marginBottom: 4,
   },
   recipeName: {
     fontSize: 15,

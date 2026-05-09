@@ -62,17 +62,9 @@ export default function HomeScreen() {
         available_ingredients: availableIngredients.length > 0 ? availableIngredients : null,
       });
 
-      Alert.alert(
-        'Success!',
-        `Your ${planType} ${cuisineType} meal plan is ready!`,
-        [
-          {
-            text: 'View Plans',
-            onPress: () => router.push('/meal-plans'),
-          },
-          { text: 'OK' },
-        ]
-      );
+      // Auto-navigate to meal plans tab after successful generation
+      router.push('/meal-plans');
+      
     } catch (error: any) {
       console.error('Error generating meal plan:', error);
       Alert.alert('Error', error.response?.data?.detail || 'Failed to generate meal plan');
